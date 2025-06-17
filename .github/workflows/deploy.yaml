@@ -65,9 +65,9 @@ jobs:
           kubeconfig: ${{ secrets.KUBE_CONFIG_BASE64 }} # Decodes the base64 secret
 
       - name: Install Helm
-        uses: azure/helm@v3
+        uses: azure/helm@v1
         with:
-          install-helm: true
+          version: '3.8.1'
 
       - name: Deploy Helm Chart
         run: |
