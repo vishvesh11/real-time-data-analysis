@@ -1,0 +1,10 @@
+FROM python:3.9-slim-buster
+
+WORKDIR /app
+
+COPY data-ingestor/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY data-ingestor/ingestor.py .
+
+CMD ["python", "ingestor.py"]
