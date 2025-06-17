@@ -1,0 +1,5 @@
+requests
+protobuf
+gtfs-realtime-bindings
+paho-mqtt
+pandas
