@@ -1,0 +1,27 @@
+{{- if .Values.dashboard.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dashboard-ingress
+  labels:
+    {{- include "realtime-app.labels" . | nindent 4 }}
+  annotations:
+    {{- toYaml .Values.dashboard.ingress.annotations | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.dashboard.ingress.className }}
+  rules:
+    - host: {{ .Values.dashboard.ingress.host }}
+      http:
+        paths:
+          - path: {{ .Values.dashboard.ingress.path }}
+            pathType: {{ .Values.dashboard.ingress.pathType }}
+            backend:
+              service:
+                name: dashboard-service
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - {{ .Values.dashboard.ingress.host }}
+      secretName: {{ .Values.dashboard.ingress.host | replace "." "-" }}-tls-secret # Cert-manager will create this
+{{- end }}

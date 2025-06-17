@@ -1,0 +1,125 @@
+# InfluxDB Configuration
+influxdb:
+  enabled: true
+  image: influxdb:2.7.0 # Use a specific version
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClassName: local-path # K3s default storage class
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  adminUser: admin # Default for initial setup
+  adminPass: changeme # Default for initial setup
+  bucket: delhi-transport-data
+  org: home
+  token: changeme # Default for initial setup
+
+# MQTT Broker Config
+mqtt:
+  enabled: true
+  image: eclipse-mosquitto:2.0.15
+  service:
+    type: ClusterIP
+    port: 1883
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# Data Ingestor Config
+ingestor:
+  enabled: true
+  image: ghcr.io/vishvesh1133/realtime-ingestor
+  imageTag: latest
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
+  env:
+    FETCH_INTERVAL_SECONDS: "10"
+    MQTT_TOPIC: "delhi/transport/raw"
+    MQTT_BROKER_HOST: "mqtt-service"
+    MQTT_BROKER_PORT: "1883"
+    DELHI_OTD_API_KEY_SECRET_NAME: "delhi-otd-api-key-secret" # Secret name
+    DELHI_OTD_API_KEY_SECRET_KEY: "DELHI_OTD_API_KEY" # Key within the secret
+
+# Data Processor Config
+processor:
+  enabled: true
+  image: ghcr.io/vishvesh1133/realtime-processor
+  imageTag: latest # Will be replaced by CI/CD
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
+  env:
+    MQTT_TOPIC: "delhi/transport/raw"
+    MQTT_BROKER_HOST: "mqtt-service" # Internal K8s service name
+    MQTT_BROKER_PORT: "1883"
+    INFLUXDB_URL: "http://influxdb-service:8086" # Internal K8s service name
+    INFLUXDB_ORG: "home"
+    INFLUXDB_BUCKET: "delhi-transport-data"
+    INFLUXDB_TOKEN_SECRET_NAME: "influxdb-token-secret" # Secret name
+    INFLUXDB_TOKEN_SECRET_KEY: "INFLUXDB_TOKEN" # Key within the secret
+
+# Streamlit Dashboard Config
+dashboard:
+  enabled: true
+  image: ghcr.io/vishvesh1133/realtime-dashboard
+  imageTag: latest
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1.5Gi
+  env:
+    INFLUXDB_URL: "http://influxdb-service:8086" # Internal K8s service name
+    INFLUXDB_ORG: "home"
+    INFLUXDB_BUCKET: "delhi-transport-data"
+    INFLUXDB_TOKEN_SECRET_NAME: "influxdb-token-secret" # Secret name
+    INFLUXDB_TOKEN_SECRET_KEY: "INFLUXDB_TOKEN" # Key within the secret
+  ingress:
+    enabled: true
+    className: traefik
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      cert-manager.io/cluster-issuer: letsencrypt-prod-cloudflare
+      external-dns.alpha.kubernetes.io/hostname: delhirealtime.vishvesh.me
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    host: delhirealtime.vishvesh.me
+    path: /
+    pathType: Prefix
+
+# General Settings
+serviceAccount:
+  create: true
+  name: "realtime-app-sa"
+
+# Secrets (will be templated from GitHub Secrets)
+secrets:
+  influxdbToken:
+    name: influxdb-token-secret
+  mqttPassword:
+    name: mqtt-password-secret
+  delhiOtdApiKey:
+    name: delhi-otd-api-key-secret

@@ -1,0 +1,84 @@
+name: Deploy Real-time App to K3s
+
+on:
+  push:
+    branches:
+      - main # Trigger on pushes to the main branch
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_INGESTOR: ${{ github.repository_owner }}/realtime-ingestor
+  IMAGE_NAME_PROCESSOR: ${{ github.repository_owner }}/realtime-processor
+  IMAGE_NAME_DASHBOARD: ${{ github.repository_owner }}/realtime-dashboard
+  K8S_NAMESPACE: default
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      # --- Build and Push Ingestor Image ---
+      - name: Build and push Ingestor image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.ingestor
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_INGESTOR }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME_INGESTOR }}:latest
+
+      # --- Build and Push Processor Image ---
+      - name: Build and push Processor image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.processor
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_PROCESSOR }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME_PROCESSOR }}:latest
+
+      # --- Build and Push Dashboard Image ---
+      - name: Build and push Dashboard image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.dashboard
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_DASHBOARD }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME_DASHBOARD }}:latest
+
+      - name: Set up Kubeconfig
+        uses: azure/k8s-set-context@v3
+        with:
+          kubeconfig: ${{ secrets.KUBE_CONFIG_BASE64 }} # Decodes the base64 secret
+
+      - name: Install Helm
+        uses: azure/helm@v3
+        with:
+          install-helm: true
+
+      - name: Deploy Helm Chart
+        run: |
+          helm upgrade realtime-app helm/realtime-app \
+            --install \
+            --namespace ${{ env.K8S_NAMESPACE }} \
+            --create-namespace \
+            --set ingress.dashboard.host=delhirealtime.vishvesh.me \ 
+            --set ingestor.imageTag=${{ github.sha }} \
+            --set processor.imageTag=${{ github.sha }} \
+            --set dashboard.imageTag=${{ github.sha }} \
+            --set-string influxdb.token=${{ secrets.INFLUXDB_ADMIN_TOKEN }} \
+            --set-string ingestor.delhiOtdApiKey=${{ secrets.DELHI_OTD_API_KEY }} \
+            --atomic

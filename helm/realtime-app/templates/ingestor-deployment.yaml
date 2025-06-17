@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingestor
+  labels:
+    app.kubernetes.io/name: ingestor
+    {{- include "realtime-app.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.ingestor.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ingestor
+      {{- include "realtime-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ingestor
+        {{- include "realtime-app.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "realtime-app.serviceAccountName" . }}
+      containers:
+        - name: ingestor
+          image: "{{ .Values.ingestor.image }}:{{ .Values.ingestor.imageTag }}"
+          env:
+            - name: FETCH_INTERVAL_SECONDS
+              value: {{ .Values.ingestor.env.FETCH_INTERVAL_SECONDS | quote }}
+            - name: MQTT_TOPIC
+              value: {{ .Values.ingestor.env.MQTT_TOPIC | quote }}
+            - name: MQTT_BROKER_HOST
+              value: {{ .Values.ingestor.env.MQTT_BROKER_HOST | quote }}
+            - name: MQTT_BROKER_PORT
+              value: {{ .Values.ingestor.env.MQTT_BROKER_PORT | quote }}
+            - name: DELHI_OTD_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.ingestor.env.DELHI_OTD_API_KEY_SECRET_NAME }}
+                  key: {{ .Values.ingestor.env.DELHI_OTD_API_KEY_SECRET_KEY }}
+          resources:
+            {{- toYaml .Values.ingestor.resources | nindent 12 }}
