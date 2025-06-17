@@ -39,7 +39,7 @@ jobs:
           context: .
           file: ./Dockerfile.ingestor
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_INGESTOR }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME_INGESTOR }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.DATA_INGESTOR }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.DATA_INGESTOR }}:latest
 
       # --- Build and Push Processor Image ---
       - name: Build and push Processor image
@@ -48,7 +48,7 @@ jobs:
           context: .
           file: ./Dockerfile.processor
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_PROCESSOR }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME_PROCESSOR }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.DATA_PROCESSOR }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.DATA_PROCESSOR }}:latest
 
       # --- Build and Push Dashboard Image ---
       - name: Build and push Dashboard image
@@ -57,7 +57,7 @@ jobs:
           context: .
           file: ./Dockerfile.dashboard
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_DASHBOARD }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME_DASHBOARD }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.DATA_DASHBOARD }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.DATA_DASHBOARD }}:latest
 
       - name: Set up Kubeconfig
         uses: azure/k8s-set-context@v3
