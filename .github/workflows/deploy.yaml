@@ -8,9 +8,9 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME_INGESTOR: ${{ github.repository_owner }}/realtime-ingestor
-  IMAGE_NAME_PROCESSOR: ${{ github.repository_owner }}/realtime-processor
-  IMAGE_NAME_DASHBOARD: ${{ github.repository_owner }}/realtime-dashboard
+  DATA_INGESTOR: ${{ github.repository_owner }}/realtime-ingestor
+  DATA_PROCESSOR: ${{ github.repository_owner }}/realtime-processor
+  DATA_DASHBOARD: ${{ github.repository_owner }}/realtime-dashboard
   K8S_NAMESPACE: default
 
 jobs:
