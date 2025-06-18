@@ -10,6 +10,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: ingestor
+      app.kubernetes.io/component: ingestor
       {{- include "realtime-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:

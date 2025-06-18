@@ -4,6 +4,7 @@ metadata:
   name: influxdb-service
   labels:
     app.kubernetes.io/name: influxdb
+    app.kubernetes.io/component: influxdb
     {{- include "realtime-app.labels" . | nindent 4 }}
 spec:
   type: ClusterIP

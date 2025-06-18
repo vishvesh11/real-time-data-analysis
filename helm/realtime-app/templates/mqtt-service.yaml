@@ -4,6 +4,7 @@ metadata:
   name: mqtt-service
   labels:
     app.kubernetes.io/name: mqtt
+    app.kubernetes.io/component: mqtt
     {{- include "realtime-app.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.mqtt.service.type }}
