@@ -1,23 +1,24 @@
 # InfluxDB Configuration
 influxdb:
   enabled: true
-  image: influxdb:2.7.0 # Use a specific version
+  image: influxdb:2.7.0
   persistence:
     enabled: true
     size: 10Gi
-    storageClassName: local-path # K3s default storage class
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: 500m
-      memory: 1Gi
-  adminUser: admin # Default for initial setup
-  adminPass: changeme # Default for initial setup
-  bucket: delhi-transport-data
-  org: home
-  token: changeme # Default for initial setup
+    storageClassName: local-path
+  nodeSelector:
+    enabled: true
+    key: "kubernetes.io/hostname"
+    value: "vishvesh-server-2"
+
+  initialAdminUsername: "admin"
+  initialAdminPasswordSecretName: "influxdb-admin-password-secret"
+  initialAdminPasswordSecretKey: "password"
+  initialAdminTokenSecretName: "influxdb-initial-admin-token-secret"
+  initialAdminTokenSecretKey: "token"
+
+  bucket: "delhi-transport-data"
+  org: "home"
 
 # MQTT Broker Config
 mqtt:
@@ -26,18 +27,16 @@ mqtt:
   service:
     type: ClusterIP
     port: 1883
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 200m
-      memory: 256Mi
+
+
+application:
+  influxdbTokenSecretName: "influxdb-application-token-secret"
+  influxdbTokenSecretKey: "token"
 
 # Data Ingestor Config
 ingestor:
   enabled: true
-  image: ghcr.io/vishvesh1133/realtime-ingestor
+  image: ghcr.io/vishvesh1133/real-time-data-analysis/realtime-ingestor
   imageTag: latest
   replicaCount: 1
   resources:
@@ -52,14 +51,14 @@ ingestor:
     MQTT_TOPIC: "delhi/transport/raw"
     MQTT_BROKER_HOST: "mqtt-service"
     MQTT_BROKER_PORT: "1883"
-    DELHI_OTD_API_KEY_SECRET_NAME: "delhi-otd-api-key-secret" # Secret name
-    DELHI_OTD_API_KEY_SECRET_KEY: "DELHI_OTD_API_KEY" # Key within the secret
+    DELHI_OTD_API_KEY_SECRET_NAME: "delhi-otd-api-key-secret"
+    DELHI_OTD_API_KEY_SECRET_KEY: "DELHI_OTD_API_KEY"
 
 # Data Processor Config
 processor:
   enabled: true
-  image: ghcr.io/vishvesh1133/realtime-processor
-  imageTag: latest # Will be replaced by CI/CD
+  image: ghcr.io/vishvesh1133/real-time-data-analysis/realtime-processor
+  imageTag: latest
   replicaCount: 1
   resources:
     requests:
@@ -70,18 +69,18 @@ processor:
       memory: 512Mi
   env:
     MQTT_TOPIC: "delhi/transport/raw"
-    MQTT_BROKER_HOST: "mqtt-service" # Internal K8s service name
+    MQTT_BROKER_HOST: "mqtt-service"
     MQTT_BROKER_PORT: "1883"
-    INFLUXDB_URL: "http://influxdb-service:8086" # Internal K8s service name
+    INFLUXDB_URL: "http://influxdb-service:8086"
     INFLUXDB_ORG: "home"
     INFLUXDB_BUCKET: "delhi-transport-data"
-    INFLUXDB_TOKEN_SECRET_NAME: "influxdb-token-secret" # Secret name
-    INFLUXDB_TOKEN_SECRET_KEY: "INFLUXDB_TOKEN" # Key within the secret
+    INFLUXDB_TOKEN_SECRET_NAME: "{{ .Values.application.influxdbTokenSecretName }}"
+    INFLUXDB_TOKEN_SECRET_KEY: "{{ .Values.application.influxdbTokenSecretKey }}"
 
 # Streamlit Dashboard Config
 dashboard:
   enabled: true
-  image: ghcr.io/vishvesh1133/realtime-dashboard
+  image: ghcr.io/vishvesh1133/real-time-data-analysis/realtime-dashboard
   imageTag: latest
   replicaCount: 1
   resources:
@@ -92,11 +91,11 @@ dashboard:
       cpu: 500m
       memory: 1.5Gi
   env:
-    INFLUXDB_URL: "http://influxdb-service:8086" # Internal K8s service name
+    INFLUXDB_URL: "http://influxdb-service:8086"
     INFLUXDB_ORG: "home"
     INFLUXDB_BUCKET: "delhi-transport-data"
-    INFLUXDB_TOKEN_SECRET_NAME: "influxdb-token-secret" # Secret name
-    INFLUXDB_TOKEN_SECRET_KEY: "INFLUXDB_TOKEN" # Key within the secret
+    INFLUXDB_TOKEN_SECRET_NAME: "{{ .Values.application.influxdbTokenSecretName }}"
+    INFLUXDB_TOKEN_SECRET_KEY: "{{ .Values.application.influxdbTokenSecretKey }}"
   ingress:
     enabled: true
     className: traefik
@@ -115,11 +114,33 @@ serviceAccount:
   create: true
   name: "realtime-app-sa"
 
-# Secrets (will be templated from GitHub Secrets)
+
+
 secrets:
-  influxdbToken:
-    name: influxdb-token-secret
-  mqttPassword:
-    name: mqtt-password-secret
+
+  influxdbInitialAdminPassword:
+    name: influxdb-admin-password-secret
+    key: password
+    value: ""
+
+  influxdbInitialAdminToken:
+    name: influxdb-initial-admin-token-secret
+    key: token
+    value: ""
+
+  influxdbApplicationToken:
+    name: influxdb-application-token-secret
+    key: token
+    value: ""
+
+  # Delhi OTD API Key
   delhiOtdApiKey:
     name: delhi-otd-api-key-secret
+    key: DELHI_OTD_API_KEY
+    value: ""
+
+imagePullSecrets:
+  - name: ghcr-secret
+
+service:
+  type: ClusterIP

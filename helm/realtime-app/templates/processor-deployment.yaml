@@ -17,6 +17,10 @@ spec:
         app.kubernetes.io/name: processor
         {{- include "realtime-app.selectorLabels" . | nindent 8 }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "realtime-app.serviceAccountName" . }}
       containers:
         - name: processor
@@ -37,7 +41,7 @@ spec:
             - name: INFLUXDB_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.processor.env.INFLUXDB_TOKEN_SECRET_NAME }}
-                  key: {{ .Values.processor.env.INFLUXDB_TOKEN_SECRET_KEY }}
+                  name: {{ .Values.application.influxdbTokenSecretName }}
+                  key: {{ .Values.application.influxdbTokenSecretKey }}
           resources:
             {{- toYaml .Values.processor.resources | nindent 12 }}

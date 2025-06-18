@@ -19,6 +19,21 @@ spec:
         {{- include "realtime-app.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "realtime-app.serviceAccountName" . }}
+
+
+      {{- if .Values.influxdb.nodeSelector.enabled }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: {{ .Values.influxdb.nodeSelector.key | quote }}
+                    operator: In
+                    values:
+                      - {{ .Values.influxdb.nodeSelector.value | quote }}
+      {{- end }}
+
+
       containers:
         - name: influxdb
           image: "{{ .Values.influxdb.image }}"
@@ -26,11 +41,14 @@ spec:
             - containerPort: 8086
           env:
             - name: DOCKER_INFLUXDB_INIT_MODE
-              value: setup
+              value: "setup"
             - name: DOCKER_INFLUXDB_INIT_USERNAME
-              value: {{ .Values.influxdb.adminUser | quote }}
+              value: {{ .Values.influxdb.initialAdminUsername | quote }}
             - name: DOCKER_INFLUXDB_INIT_PASSWORD
-              value: {{ .Values.influxdb.adminPass | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.influxdb.initialAdminPasswordSecretName }}
+                  key: {{ .Values.influxdb.initialAdminPasswordSecretKey }}
             - name: DOCKER_INFLUXDB_INIT_ORG
               value: {{ .Values.influxdb.org | quote }}
             - name: DOCKER_INFLUXDB_INIT_BUCKET
@@ -38,8 +56,8 @@ spec:
             - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.secrets.influxdbToken.name }}
-                  key: INFLUXDB_TOKEN
+                  name: {{ .Values.influxdb.initialAdminTokenSecretName }}
+                  key: {{ .Values.influxdb.initialAdminTokenSecretKey }}
           volumeMounts:
             - name: influxdb-storage
               mountPath: /var/lib/influxdb2

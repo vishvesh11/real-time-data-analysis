@@ -17,6 +17,10 @@ spec:
         app.kubernetes.io/name: ingestor
         {{- include "realtime-app.selectorLabels" . | nindent 8 }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "realtime-app.serviceAccountName" . }}
       containers:
         - name: ingestor

@@ -22,6 +22,14 @@ spec:
         - name: mqtt
           image: "{{ .Values.mqtt.image }}"
           ports:
-            - containerPort: 1883
+            - containerPort: {{ .Values.mqtt.service.port }}
           resources:
             {{- toYaml .Values.mqtt.resources | nindent 12 }}
+          volumeMounts:
+            - name: mosquitto-config-volume
+              mountPath: /mosquitto/config/mosquitto.conf
+              subPath: mosquitto.conf
+      volumes:
+        - name: mosquitto-config-volume
+          configMap:
+            name: {{ include "realtime-app.fullname" . }}-mosquitto-config
