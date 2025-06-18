@@ -19,7 +19,6 @@ spec:
               service:
                 name: dashboard-service
                 port: 80
-                  name: http
   tls:
     - hosts:
         - {{ .Values.dashboard.ingress.host }}
