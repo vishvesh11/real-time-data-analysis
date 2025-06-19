@@ -4,7 +4,7 @@ metadata:
   name: dashboard-service
   labels:
     app.kubernetes.io/name: dashboard
-    app.kubernetes.io/component: dashboard
+    #app.kubernetes.io/component: dashboard
     {{- include "realtime-app.labels" . | nindent 4 }}
 spec:
   type: ClusterIP

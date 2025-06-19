@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: processor
-      app.kubernetes.io/component: processor
+      #.kubernetes.io/component: processor
       {{- include "realtime-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:

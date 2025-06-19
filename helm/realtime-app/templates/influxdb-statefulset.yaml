@@ -11,7 +11,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: influxdb
-      app.kubernetes.io/component: influxdb
+      #app.kubernetes.io/component: influxdb
       {{- include "realtime-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:

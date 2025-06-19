@@ -4,7 +4,7 @@ metadata:
   name: ingestor-service
   labels:
     app.kubernetes.io/name: ingestor
-    app.kubernetes.io/component: ingestor
+    #app.kubernetes.io/component: ingestor
     {{- include "realtime-app.labels" . | nindent 4 }}
 spec:
   type: ClusterIP

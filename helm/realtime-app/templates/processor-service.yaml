@@ -4,7 +4,7 @@ metadata:
   name: processor-service
   labels:
     app.kubernetes.io/name: processor
-    app.kubernetes.io/component: processor
+    #app.kubernetes.io/component: processor
     {{- include "realtime-app.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
