@@ -9,7 +9,7 @@ influxdb:
   nodeSelector:
     enabled: true
     key: "kubernetes.io/hostname"
-    value: "vishveshserver"
+    value: "instance-20250704-0029"
 
   initialAdminUsername: "admin"
   initialAdminPasswordSecretName: "influxdb-admin-password-secret"
