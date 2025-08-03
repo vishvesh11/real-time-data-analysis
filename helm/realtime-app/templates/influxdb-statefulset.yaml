@@ -64,12 +64,7 @@ spec:
               mountPath: /var/lib/influxdb2
           resources:
             {{- toYaml .Values.influxdb.resources | nindent 12 }}
-  volumeClaimTemplates:
-    - metadata:
-        name: influxdb-storage
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        storageClassName: {{ .Values.influxdb.persistence.storageClassName }}
-        resources:
-          requests:
-            storage: {{ .Values.influxdb.persistence.size }}
+      volumes: # <-- ADD THIS SECTION
+        - name: influxdb-storage
+          persistentVolumeClaim:
+            claimName: influxdb-storage-influxdb-0
