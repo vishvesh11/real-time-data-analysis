@@ -91,9 +91,3 @@ jobs:
             --set secrets.delhiOtdApiKey.value="${{ secrets.DELHI_OTD_API_KEY }}" \
             --set secrets.mqttPassword.value="${{ secrets.MQTT_BROKER_PASSWORD }}" \
             --atomic
-#        env:
-#          K8S_NAMESPACE: # ... (your namespace env var)
-#          REGISTRY: # ... (your registry env var)
-#          DATA_INGESTOR: # ...
-#          DATA_PROCESSOR: # ...
-#          DATA_DASHBOARD:

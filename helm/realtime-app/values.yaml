@@ -4,12 +4,12 @@ influxdb:
   image: influxdb:2.7.0
   persistence:
     enabled: true
-    size: 10Gi
+    size: 1Gi
     storageClassName: local-path
   nodeSelector:
     enabled: true
     key: "kubernetes.io/hostname"
-    value: "vishvesh-server-2"
+    value: "vishveshserver"
 
   initialAdminUsername: "admin"
   initialAdminPasswordSecretName: "influxdb-admin-password-secret"
