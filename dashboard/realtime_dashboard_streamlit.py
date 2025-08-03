@@ -23,8 +23,11 @@ query_api = influx_client.query_api()
 
 # Function to calculate Haversine distance (geodesic distance on a sphere)
 def calculate_distance_km(lat1, lon1, lat2, lon2):
+
     return geodesic((lat1, lon1), (lat2, lon2)).km
 
+
+print("helllo0")
 
 @st.cache_data(ttl=5)  # Cache data for 5 seconds
 def fetch_live_data_from_influxdb():
@@ -151,7 +154,7 @@ while True:
         else:
             st.subheader("Live Vehicle Positions")
 
-            # Prepare text for hoverinfo including speed
+            # Prepare text for hover-info including speed
             df['hover_text'] = df.apply(lambda row:
                                         f"Vehicle ID: {row['vehicle_id']}<br>"
                                         f"Route: {row.get('route_id', 'N/A')}<br>"
@@ -165,7 +168,7 @@ while True:
                 mode='markers',
                 marker=go.scattermapbox.Marker(
                     size=10,
-                    color=df['speed_kmh'],  # Color by speed
+                    color=df['speed_kmh'],  # Color by speed of the buses
                     colorscale="Viridis",
                     colorbar=dict(title="Speed (km/h)"),
                     opacity=0.7

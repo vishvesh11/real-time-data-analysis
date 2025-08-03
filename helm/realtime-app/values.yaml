@@ -83,6 +83,10 @@ dashboard:
   image: ghcr.io/vishvesh1133/real-time-data-analysis/realtime-dashboard
   imageTag: latest
   replicaCount: 1
+  nodeSelector:
+    enabled: true
+    key: "kubernetes.io/arch"
+    value: "arm64"
   resources:
     requests:
       cpu: 100m

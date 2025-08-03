@@ -9,6 +9,8 @@ import os
 MQTT_BROKER_HOST = os.getenv("MQTT_BROKER_HOST", "localhost")
 MQTT_BROKER_PORT = int(os.getenv("MQTT_BROKER_PORT"))
 MQTT_TOPIC = os.getenv("MQTT_TOPIC", "delhi/gtfs/vehicle_positions")
+print("helllo0")
+
 
 
 INFLUXDB_URL = os.getenv("INFLUXDB_URL")

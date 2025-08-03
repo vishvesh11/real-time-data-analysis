@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: dashboard
   labels:
+    pod-type: dashboard
     app.kubernetes.io/name: dashboard
     {{- include "realtime-app.labels" . | nindent 4 }}
 spec:

@@ -10,6 +10,9 @@ import pandas as pd # Make sure pandas is imported for pd.to_datetime
 # DELHI OTD CONFIG
 DELHI_OTD_API_KEY = os.getenv("DELHI_OTD_API_KEY")
 GTFS_REALTIME_URL = "https://otd.delhi.gov.in/api/realtime/VehiclePositions.pb?key=" + DELHI_OTD_API_KEY
+print("helllo0")
+
+
 
 
 # Local MQTT Broker
