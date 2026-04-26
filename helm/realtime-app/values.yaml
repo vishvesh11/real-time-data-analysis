@@ -34,7 +34,7 @@ application:
 # Data Ingestor Config
 ingestor:
   enabled: true
-  image: ghcr.io/vishvesh1133/real-time-data-analysis/realtime-ingestor
+  image: ghcr.io/vishvesh11/real-time-data-analysis/realtime-ingestor
   imageTag: latest
   replicaCount: 1
   nodeSelector:
@@ -58,7 +58,7 @@ ingestor:
 # Data Processor Config
 processor:
   enabled: true
-  image: ghcr.io/vishvesh1133/real-time-data-analysis/realtime-processor
+  image: ghcr.io/vishvesh11/real-time-data-analysis/realtime-processor
   imageTag: latest
   replicaCount: 1
   nodeSelector:
@@ -84,7 +84,7 @@ processor:
 # Streamlit Dashboard Config
 dashboard:
   enabled: true
-  image: ghcr.io/vishvesh1133/real-time-data-analysis/realtime-dashboard
+  image: ghcr.io/vishvesh11/real-time-data-analysis/realtime-dashboard
   imageTag: latest
   replicaCount: 1
   nodeSelector:
