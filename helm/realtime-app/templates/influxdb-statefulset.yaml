@@ -11,7 +11,6 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: influxdb
-      #app.kubernetes.io/component: influxdb
       {{- include "realtime-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
@@ -20,13 +19,11 @@ spec:
         {{- include "realtime-app.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "realtime-app.serviceAccountName" . }}
-
-
+      
       {{- with .Values.influxdb.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
 
       containers:
         - name: influxdb
@@ -57,12 +54,14 @@ spec:
               mountPath: /var/lib/influxdb2
           resources:
             {{- toYaml .Values.influxdb.resources | nindent 12 }}
-    volumeClaimTemplates:
-      - metadata:
-          name: influxdb-storage
-        spec:
-          accessModes: [ "ReadWriteOnce" ]
-          storageClassName: {{ .Values.influxdb.persistence.storageClassName }}
-          resources:
-            requests:
-              storage: {{ .Values.influxdb.persistence.size }}
+
+  # Note: This is aligned with 'template:', NOT inside it
+  volumeClaimTemplates:
+    - metadata:
+        name: influxdb-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: {{ .Values.influxdb.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.influxdb.persistence.size }}
