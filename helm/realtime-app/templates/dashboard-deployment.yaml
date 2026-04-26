@@ -24,6 +24,11 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "realtime-app.serviceAccountName" . }}
+
+      {{- with .Values.dashboard.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: dashboard
           image: "{{ .Values.dashboard.image }}:{{ .Values.dashboard.imageTag }}"

@@ -4,12 +4,11 @@ influxdb:
   image: influxdb:2.7.0
   persistence:
     enabled: true
-    size: 1Gi
+    size: 512Mi
     storageClassName: local-path
   nodeSelector:
-    enabled: true
-    key: "kubernetes.io/hostname"
-    value: "instance-20250704-0029"
+    topology.kubernetes.io/zone: cloud
+    kubernetes.io/arch: arm64
 
   initialAdminUsername: "admin"
   initialAdminPasswordSecretName: "influxdb-admin-password-secret"
@@ -28,7 +27,6 @@ mqtt:
     type: ClusterIP
     port: 1883
 
-
 application:
   influxdbTokenSecretName: "influxdb-application-token-secret"
   influxdbTokenSecretKey: "token"
@@ -39,6 +37,9 @@ ingestor:
   image: ghcr.io/vishvesh1133/real-time-data-analysis/realtime-ingestor
   imageTag: latest
   replicaCount: 1
+  nodeSelector:
+    topology.kubernetes.io/zone: cloud
+    kubernetes.io/arch: arm64
   resources:
     requests:
       cpu: 50m
@@ -60,6 +61,9 @@ processor:
   image: ghcr.io/vishvesh1133/real-time-data-analysis/realtime-processor
   imageTag: latest
   replicaCount: 1
+  nodeSelector:
+    topology.kubernetes.io/zone: cloud
+    kubernetes.io/arch: arm64
   resources:
     requests:
       cpu: 50m
@@ -84,9 +88,8 @@ dashboard:
   imageTag: latest
   replicaCount: 1
   nodeSelector:
-    enabled: true
-    key: "kubernetes.io/arch"
-    value: "arm64"
+    topology.kubernetes.io/zone: cloud
+    kubernetes.io/arch: arm64
   resources:
     requests:
       cpu: 100m
@@ -94,18 +97,20 @@ dashboard:
     limits:
       cpu: 500m
       memory: 1.5Gi
+
   env:
     INFLUXDB_URL: "http://influxdb-service:8086"
     INFLUXDB_ORG: "home"
     INFLUXDB_BUCKET: "delhi-transport-data"
     INFLUXDB_TOKEN_SECRET_NAME: "{{ .Values.application.influxdbTokenSecretName }}"
     INFLUXDB_TOKEN_SECRET_KEY: "{{ .Values.application.influxdbTokenSecretKey }}"
+
   ingress:
     enabled: true
     className: traefik
     annotations:
       kubernetes.io/ingress.class: traefik
-      cert-manager.io/cluster-issuer: letsencrypt-prod-cloudflare
+      cert-manager.io/cluster-issuer: letsencrypt-cloudflare
       external-dns.alpha.kubernetes.io/hostname: delhirealtime.vishvesh.me
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.tls: "true"
@@ -117,8 +122,6 @@ dashboard:
 serviceAccount:
   create: true
   name: "realtime-app-sa"
-
-
 
 secrets:
 

@@ -23,6 +23,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "realtime-app.serviceAccountName" . }}
+      {{- with .Values.dashboard.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: ingestor
           image: "{{ .Values.ingestor.image }}:{{ .Values.ingestor.imageTag }}"

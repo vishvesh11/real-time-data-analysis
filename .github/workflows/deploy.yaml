@@ -1,32 +1,28 @@
-name: Deploy Real-time App to K3s
+name: Build and Push Real-time App Images
 
 on:
   push:
     branches:
-      - main # Trigger on pushes to the main branch
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+      - main
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
   DATA_INGESTOR: ${{ github.repository }}/realtime-ingestor
   DATA_PROCESSOR: ${{ github.repository }}/realtime-processor
   DATA_DASHBOARD: ${{ github.repository }}/realtime-dashboard
-  K8S_NAMESPACE: default
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
-    environment: production
-
     permissions:
       contents: read
-      packages: write # Needed to push images to GHCR
+      packages: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Set up QEMU and Buildx for multi-platform builds
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -40,57 +36,27 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      # --- Build and Push Ingestor Image (default arch) ---
       - name: Build and push Ingestor image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile.ingestor
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.DATA_INGESTOR }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.DATA_INGESTOR }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.DATA_INGESTOR }}:latest
 
-      # --- Build and Push Processor Image (default arch) ---
       - name: Build and push Processor image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile.processor
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.DATA_PROCESSOR }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.DATA_PROCESSOR }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.DATA_PROCESSOR }}:latest
 
-      # --- Build and Push Dashboard Image (for ARM64) ---
       - name: Build and push Dashboard image for ARM64
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile.dashboard
           push: true
-          platforms: linux/arm64 # This builds specifically for ARM64
-          tags: ${{ env.REGISTRY }}/${{ env.DATA_DASHBOARD }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.DATA_DASHBOARD }}:latest
-
-      - name: Install Helm
-        uses: azure/setup-helm@v4 # Using a modern version for compatibility
-
-      - name: Set Kubeconfig
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG_BASE64 }}" | base64 -d > ~/.kube/config
-          chmod 600 ~/.kube/config
-          kubectl cluster-info
-          kubectl get nodes # Add this to verify node connection
-
-      - name: Deploy Helm Chart
-        run: |
-          helm upgrade realtime-app helm/realtime-app --install --namespace ${{ env.K8S_NAMESPACE }} --create-namespace \
-            --set dashboard.ingress.host=delhirealtime.vishvesh.me \
-            --set ingestor.image=${{ env.REGISTRY }}/${{ env.DATA_INGESTOR }} \
-            --set ingestor.imageTag=${{ github.sha }} \
-            --set processor.image=${{ env.REGISTRY }}/${{ env.DATA_PROCESSOR }} \
-            --set processor.imageTag=${{ github.sha }} \
-            --set dashboard.image=${{ env.REGISTRY }}/${{ env.DATA_DASHBOARD }} \
-            --set dashboard.imageTag=${{ github.sha }} \
-            --set secrets.influxdbInitialAdminPassword.value="${{ secrets.INFLUXDB_INITIAL_ADMIN_PASSWORD }}" \
-            --set secrets.influxdbInitialAdminToken.value="${{ secrets.INFLUXDB_INITIAL_ADMIN_TOKEN }}" \
-            --set secrets.influxdbApplicationToken.value="${{ secrets.INFLUXDB_APPLICATION_TOKEN }}" \
-            --set secrets.delhiOtdApiKey.value="${{ secrets.DELHI_OTD_API_KEY }}" \
-            --atomic
+          platforms: linux/arm64
+          tags: ${{ env.REGISTRY }}/${{ env.DATA_DASHBOARD }}:latest

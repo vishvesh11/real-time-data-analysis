@@ -22,16 +22,9 @@ spec:
       serviceAccountName: {{ include "realtime-app.serviceAccountName" . }}
 
 
-      {{- if .Values.influxdb.nodeSelector.enabled }}
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: {{ .Values.influxdb.nodeSelector.key | quote }}
-                    operator: In
-                    values:
-                      - {{ .Values.influxdb.nodeSelector.value | quote }}
+      {{- with .Values.influxdb.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
 
 

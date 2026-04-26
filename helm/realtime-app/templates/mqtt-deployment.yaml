@@ -19,6 +19,10 @@ spec:
         {{- include "realtime-app.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "realtime-app.serviceAccountName" . }}
+      {{- with .Values.mqtt.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: mqtt
           image: "{{ .Values.mqtt.image }}"
