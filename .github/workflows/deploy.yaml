@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "dashboard/**"
+      - "ingestor/**"
+      - "processor/**"
   workflow_dispatch:
 
 env:
