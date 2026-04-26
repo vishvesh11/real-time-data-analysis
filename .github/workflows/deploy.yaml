@@ -8,6 +8,7 @@ on:
       - "dashboard/**"
       - "ingestor/**"
       - "processor/**"
+      - ".github/workflows/deploy.yaml"
   workflow_dispatch:
 
 env:
@@ -46,6 +47,7 @@ jobs:
           context: .
           file: ./Dockerfile.ingestor
           push: true
+          platforms: linux/arm64
           tags: ${{ env.REGISTRY }}/${{ env.DATA_INGESTOR }}:latest
 
       - name: Build and push Processor image
@@ -54,6 +56,7 @@ jobs:
           context: .
           file: ./Dockerfile.processor
           push: true
+          platforms: linux/arm64
           tags: ${{ env.REGISTRY }}/${{ env.DATA_PROCESSOR }}:latest
 
       - name: Build and push Dashboard image for ARM64
