@@ -15,4 +15,5 @@ spec:
       name: http
   selector:
     app.kubernetes.io/name: influxdb
+    app.kubernetes.io/component: influxdb
     {{- include "realtime-app.selectorLabels" . | nindent 4 }}

@@ -16,6 +16,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: influxdb
+        app.kubernetes.io/component: influxdb
         {{- include "realtime-app.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "realtime-app.serviceAccountName" . }}
