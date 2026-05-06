@@ -66,11 +66,11 @@ processor:
     kubernetes.io/arch: arm64
   resources:
     requests:
-      cpu: 50m
-      memory: 128Mi
+      cpu: 100m
+      memory: 256Mi
     limits:
-      cpu: 200m
-      memory: 512Mi
+      cpu: 500m
+      memory: 1024Mi
   env:
     MQTT_TOPIC: "delhi/transport/raw"
     MQTT_BROKER_HOST: "mqtt-service"

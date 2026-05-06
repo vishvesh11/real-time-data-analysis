@@ -3,8 +3,8 @@ kind: Service
 metadata:
   name: processor-service
   labels:
-    app.kubernetes.io/name: processor
-    #app.kubernetes.io/component: processor
+    #app.kubernetes.io/name: processor
+    app.kubernetes.io/component: processor
     {{- include "realtime-app.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
@@ -14,6 +14,6 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app.kubernetes.io/name: processor
+    #app.kubernetes.io/name: processor
     app.kubernetes.io/component: processor
     {{- include "realtime-app.selectorLabels" . | nindent 4 }}

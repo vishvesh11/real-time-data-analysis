@@ -4,19 +4,22 @@ metadata:
   name: processor
   labels:
     app.kubernetes.io/name: processor
+    app.kubernetes.io/component: processor 
     {{- include "realtime-app.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.processor.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: processor
+      #app.kubernetes.io/name: processor
       app.kubernetes.io/component: processor 
       #.kubernetes.io/component: processor
       {{- include "realtime-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: processor
+        #app.kubernetes.io/name: processor
+        app.kubernetes.io/component: processor 
+
         {{- include "realtime-app.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}

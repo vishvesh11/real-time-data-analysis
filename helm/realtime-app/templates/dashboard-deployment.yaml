@@ -4,19 +4,20 @@ metadata:
   name: dashboard
   labels:
     pod-type: dashboard
-    app.kubernetes.io/name: dashboard
+    #app.kubernetes.io/name: dashboard
+    app.kubernetes.io/component: dashboard
     {{- include "realtime-app.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.dashboard.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: dashboard
-      #app.kubernetes.io/component: dashboard
+      #app.kubernetes.io/name: dashboard
+      app.kubernetes.io/component: dashboard
       {{- include "realtime-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: dashboard
+        #app.kubernetes.io/name: dashboard
         app.kubernetes.io/component: dashboard
         {{- include "realtime-app.selectorLabels" . | nindent 8 }}
     spec:

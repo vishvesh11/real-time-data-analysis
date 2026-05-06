@@ -4,19 +4,20 @@ metadata:
   name: ingestor
   labels:
     app.kubernetes.io/name: ingestor
+    app.kubernetes.io/component: ingestor
     {{- include "realtime-app.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.ingestor.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: ingestor
+      #app.kubernetes.io/name: ingestor
       app.kubernetes.io/component: ingestor
-      #app.kubernetes.io/component: ingestor
       {{- include "realtime-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: ingestor
+        #app.kubernetes.io/name: ingestor
+        app.kubernetes.io/component: ingestor
         {{- include "realtime-app.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
