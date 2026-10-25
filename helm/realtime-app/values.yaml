@@ -7,7 +7,6 @@ influxdb:
     size: 512Mi
     storageClassName: local-path
   nodeSelector:
-    topology.kubernetes.io/zone: cloud
     kubernetes.io/arch: arm64
 
   initialAdminUsername: "admin"
