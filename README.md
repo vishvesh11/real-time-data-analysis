@@ -1,5 +1,5 @@
 # Real-time Delhi Public Transport Monitoring
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-View%20Project-blue.svg)](http://delhirealtime.vishvesh.me)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-View%20Project-blue.svg)](https://delhi-otd.vishvesh.me)
 [](https://opensource.org/licenses/MIT)
 [](https://www.google.com/search?q=https://GitHub.com/your-username/your-repo/graphs/commit-activity)
 [](https://www.google.com/search?q=https://GitHub.com/your-username/your-repo/commits/main)
