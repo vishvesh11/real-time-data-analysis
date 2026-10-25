@@ -7,7 +7,7 @@ influxdb:
     size: 512Mi
     storageClassName: local-path
   nodeSelector:
-    kubernetes.io/hostname: instance-20250530-2005
+    topology.kubernetes.io/zone: on-prem
 
   initialAdminUsername: "admin"
   initialAdminPasswordSecretName: "influxdb-admin-password-secret"
